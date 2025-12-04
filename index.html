@@ -2,25 +2,39 @@
 <html>
 <head>
   <title>Rifa App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    body { font-family: Arial; text-align: center; margin: 30px; }
     input, button { margin: 5px; padding: 10px; font-size: 16px; }
+    #lista, #historial { margin-top: 20px; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
   <h1>🎉 Rifa App</h1>
+
   <input id="nombre" placeholder="Ingresa nombre">
   <button onclick="agregar()">Agregar</button>
   <button onclick="sortear()">Sortear</button>
+  <button onclick="exportar()">Exportar lista</button>
+  <button onclick="compartir()">Compartir app</button>
+
+  <h3>Participantes</h3>
   <div id="lista"></div>
+
   <h2 id="ganador"></h2>
+
+  <h3>Historial de ganadores</h3>
+  <div id="historial"></div>
+
+  <audio id="audioGanador" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
 
 <script>
 let participantes = [];
 
 function agregar() {
-  const nombre = document.getElementById("nombre").value;
-  if(nombre) {
+  const nombre = document.getElementById("nombre").value.trim();
+  if (nombre) {
     participantes.push(nombre);
     document.getElementById("lista").innerHTML = participantes.join("<br>");
     document.getElementById("nombre").value = "";
@@ -28,12 +42,38 @@ function agregar() {
 }
 
 function sortear() {
-  if(participantes.length === 0) {
+  if (participantes.length === 0) {
     alert("No hay participantes");
     return;
   }
   const ganador = participantes[Math.floor(Math.random() * participantes.length)];
   document.getElementById("ganador").innerText = "🎊 Ganador: " + ganador;
+  document.getElementById("historial").innerHTML += ganador + "<br>";
+  lanzarConfeti();
+  document.getElementById("audioGanador").play();
+}
+
+function lanzarConfeti() {
+  confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 }
+  });
+}
+
+function exportar() {
+  const texto = participantes.join("\n");
+  const blob = new Blob([texto], { type: "text/plain" });
+  const enlace = document.createElement("a");
+  enlace.href = URL.createObjectURL(blob);
+  enlace.download = "participantes.txt";
+  enlace.click();
+}
+
+function compartir() {
+  const url = "https://alopezh20000.github.io/rifa-app/";
+  const mensaje = encodeURIComponent("¡Prueba esta app de rifas! 🎉 " + url);
+  window.open("https://wa.me/?text=" + mensaje);
 }
 </script>
 </body>
